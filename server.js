@@ -16,7 +16,7 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/assignment
 app.use(express.json());
 app.use(logger); 
 
-app.use("/api/resources", itemsRouter);
+app.use("/api/items", itemsRouter);
 
 // Global fallthrough route: Catches invalid paths.
 app.use((req, res) => {

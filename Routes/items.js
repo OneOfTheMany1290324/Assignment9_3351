@@ -6,9 +6,6 @@ import { Item } from "../models/Item.js";
 const router = express.Router();
 
 
-// The in-memory record storage array
-let mockDatabase = [];
-
 // Reads all the reosource records.
 router.get("/", async (req, res) => {
     try { 
@@ -20,15 +17,18 @@ router.get("/", async (req, res) => {
 });
 
 // Dynamic GET route: extracts the route parameters via the req.params
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
+    try {
+        const targetID = req.params.id;
+        const match = await Item.findById(targetID);
 
-    const targetID = req.params.id;
-    const match = mockDatabase.find(item => item.id === targetID);
-
-    if (!match){
-        return res.status(404).json({ error: `Resource item with ID: ${targetID} does not exist.`});
+        if (!match) {
+            return res.status(404).json({ error: `Resource item with ID: ${targetID} does not exist.` });
+        }
+        res.status(200).json({ data: match });
+    } catch (err) {
+        res.status(400).json({ error: "Invalid ID format." });
     }
-    res.status(200).json({ data: match });
 });
 
 // Post route with validation handshakes
@@ -45,11 +45,6 @@ router.post("/", async (req, res) => {
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
-});
-
-   const newItem = {id: Date.now().toString(), title: title.trim()};
-   mockDatabase.push(newItem);
-   res.status(201).json({ data: newItem });
 });
 
 
